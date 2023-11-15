@@ -22,6 +22,15 @@ spec:
         name: demos
         ports:
         - containerPort: 8080
+        securityContext:
+          capabilities:
+            drop:
+              - ALL
+          privileged: false
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          # readOnlyRootFilesystem: true
         resources: 
           requests:
             cpu: "50m"
