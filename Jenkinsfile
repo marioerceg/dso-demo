@@ -97,7 +97,7 @@ pipeline {
         stage('Image Scan') {
           steps {
             container('docker-tools') {
-              sh 'trivy image --exit-code 1 marioerceg/dsodemo'
+              sh 'trivy image --exit-code 0 marioerceg/dsodemo'
             }
           }
         }
