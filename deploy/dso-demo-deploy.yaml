@@ -18,7 +18,7 @@ spec:
         app: dso-demo
     spec:
       containers:
-      - image: marioerceg/demos:v5
+      - image: marioerceg/dsodemo
         name: demos
         ports:
         - containerPort: 8080
