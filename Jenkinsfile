@@ -67,7 +67,6 @@ pipeline {
                           '''
                 }
             }
-          }
         }
         stage('SAST') {
           steps {
@@ -78,23 +77,6 @@ pipeline {
           post {
             success {
               archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*', fingerprint: true, onlyIfSuccessful: true
-            }
-          }
-        }
-    }
-    stage('Package') {
-      parallel {
-        stage('Create Jarfile') {
-          steps {
-            container('maven') {
-              sh 'mvn package -DskipTests'
-            }
-          }
-        }
-        stage('OCI BnP') {
-          steps {
-            container('kaniko') {
-              sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/marioerceg/dsodemo'
             }
           }
         }
@@ -118,6 +100,25 @@ pipeline {
         }
       }
     }
+    stage('Package') {
+      parallel {
+        stage('Create Jarfile') {
+          steps {
+            container('maven') {
+              sh 'mvn package -DskipTests'
+            }
+          }
+        }
+        stage('OCI BnP') {
+          steps {
+            container('kaniko') {
+              sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/marioerceg/dsodemo'
+            }
+          }
+        }
+      }
+    }
+
     stage('Deploy to Dev') {
       steps {
         // TODO
