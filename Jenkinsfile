@@ -69,18 +69,18 @@ pipeline {
             }
           }
         }
-    }
-    stage('SAST') {
-      steps {
-        container('slscan') {
-          sh 'scan --type java,depscan --build'
+        stage('SAST') {
+          steps {
+            container('slscan') {
+              sh 'scan --type java,depscan --build'
+            }
+          }
+          post {
+            success {
+              archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*', fingerprint: true, onlyIfSuccessful: true
+            }
+          }
         }
-      }
-      post {
-        success {
-          archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/*', fingerprint: true, onlyIfSuccessful: true
-        }
-      }
     }
     stage('Package') {
       parallel {
@@ -95,6 +95,25 @@ pipeline {
           steps {
             container('kaniko') {
               sh '/kaniko/executor -f `pwd`/Dockerfile -c `pwd` --insecure --skip-tls-verify --cache=true --destination=docker.io/marioerceg/dsodemo'
+            }
+          }
+        }
+      }
+    }
+
+    stage('Image Analysis') {
+      parallel {
+        stage('Image Linting') {
+          steps {
+            container('docker-tools') {
+              sh 'dockle docker.io/marioerceg/dsodemo'
+            }
+          }
+        }
+        stage('Image Scan') {
+          steps {
+            container('docker-tools') {
+              sh 'trivy image --exit-code 1 marioerceg/dsodemo'
             }
           }
         }
