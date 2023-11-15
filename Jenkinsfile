@@ -100,7 +100,6 @@ pipeline {
         }
       }
     }
-
     stage('Image Analysis') {
       parallel {
         stage('Image Linting') {
@@ -119,7 +118,6 @@ pipeline {
         }
       }
     }
-
     stage('Deploy to Dev') {
       steps {
         // TODO
